@@ -1,30 +1,36 @@
 #!/usr/bin/python3
+"""UTF-8 Validation Module
 """
-Main file for testing
-"""
 
-validUTF8 = __import__('0-validate_utf8').validUTF8
 
-data = [65]
-print(validUTF8(data))
+def validUTF8(data):
+    """Determines if a given data set represents a valid UTF-8 encoding.
 
-data = [80, 121, 116, 104, 111, 110, 32, 105, 115, 32, 99, 111, 111, 108, 33]
-print(validUTF8(data))
+    Args:
+        data (list): list of integers
 
-data = [229, 65, 127, 256]
-print(validUTF8(data))
+    Returns:
+        bool: True if data is a valid UTF-8 encoding, else return False
+    """
+    n_bytes = 0
 
-data = [467, 133, 108]
-print(validUTF8(data), "x True")
-data = [240, 188, 128, 167]
-print(validUTF8(data), "x True")
-data = [235, 140]
-print(validUTF8(data), "x False")
-data = [345, 467]
-print(validUTF8(data), "x False")
-data = [250, 145, 145, 145, 145]
-print(validUTF8(data), "x False")
-data = [0, 0, 0, 0, 0, 0]
-print(validUTF8(data), "x True")
-data = []
-print(validUTF8(data), "x True")
+    for num in data:
+        byte = num & 0xff
+        if n_bytes == 0:
+            mask1 = 1 << 7
+            mask2 = 1 << 6
+            while mask1 & byte:
+                n_bytes += 1
+                mask1 = mask1 >> 1
+                mask2 = mask2 >> 1
+            if n_bytes == 0:
+                continue
+            if n_bytes == 1 or n_bytes > 4:
+                return False
+        else:
+            mask1 = 1 << 7
+            mask2 = 1 << 6
+            if not (byte & mask1 and not (byte & mask2)):
+                return False
+        n_bytes -= 1
+    return n_bytes == 0
